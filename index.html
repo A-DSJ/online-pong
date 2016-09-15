@@ -9,11 +9,20 @@
 	<h1>Online Pong Works</h1>
 
 	<script type="text/javascript">
+
+		var api = 'http://localhost:8082/';
 		
-		var mySocket = io.connect('http://localhost:8082');
+		var mySocket = io.connect(api);
 
 		mySocket.on('welcome', function(data){
-			console.log(data);
+			console.log(data.message);
+			console.log(data.room_id);
+
+			var room = io.connect(api + data.room_id);
+
+			room.on('playerNumber', function(data){
+				console.log(data);
+			})
 		});
 
 	</script>
