@@ -10,22 +10,39 @@
 
 	<script type="text/javascript">
 
-		var api = 'http://localhost:8082/';
-		
-		var mySocket = io.connect(api);
+		var api = 'http://localhost:8082/', 
+			mySocket = io.connect(api),
+			room, playerId;
 
 		mySocket.on('welcome', function(data){
 			console.log(data.message);
 			console.log(data.room_id);
 
-			var room = io.connect(api + data.room_id);
+			room = io.connect(api + data.room_id);
 
 			room.on('playerNumber', function(data){
 				console.log(data);
-			})
+				playerId = data.player_id;
+			});
+
+
+			room.on('positionChange', function(X, Y, playerId){
+				console.log(Y, X, playerId);
+			});
 		});
 
+		function mouseMoved(event){
+			room.emit('update', event.clientX, 
+				event.clientY, playerId);
+		}
+
 	</script>
+
+	<div id="controller"
+	style="width:825px;height:200px;border:1px solid"
+	onmousemove="mouseMoved(event)">
+
+	</div>
 
 </body>
 </html>
