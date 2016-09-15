@@ -2,10 +2,21 @@
 <html>
 <head>
 	<title>Online Pong</title>
+	<script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
 	<h1>Online Pong Works</h1>
+
+	<script type="text/javascript">
+		
+		var mySocket = io.connect('http://localhost:8082');
+
+		mySocket.on('welcome', function(data){
+			console.log(data);
+		});
+
+	</script>
 
 </body>
 </html>
