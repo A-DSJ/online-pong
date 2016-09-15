@@ -3,6 +3,7 @@
 <head>
 	<title>Online Pong</title>
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="/onlinePong.js"></script>
 </head>
 <body>
 
@@ -28,6 +29,7 @@
 
 			room.on('positionChange', function(X, Y, playerId){
 				console.log(Y, X, playerId);
+				newPosition(Y, X, playerId);
 			});
 		});
 
@@ -37,6 +39,10 @@
 		}
 
 	</script>
+
+	<canvas id="canvas">
+		
+	</canvas>
 
 	<div id="controller"
 	style="width:825px;height:200px;border:1px solid"

@@ -14,6 +14,10 @@ app.get('/', function handler(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/onlinePong.js', function(req, res){
+	res.sendFile(__dirname + '/onlinePong.js')
+})
+
 //Socket general
 io.sockets.on('connect', function(socket){
 
