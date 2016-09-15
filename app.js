@@ -35,6 +35,11 @@ io.sockets.on('connect', function(socket){
 
 			socket.emit('playerNumber', {player_id:players[id]});
 
+			socket.on('start', function(){
+				console.log("One player started the game for room:" + id);
+				socket.broadcast.emit('gameStarted');
+			});
+
 			socket.on('update', function(X, Y, playerId){
 
 				console.log(X + " " + Y + " " + playerId);

@@ -3,52 +3,105 @@
 <head>
 	<title>Online Pong</title>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="/onlinePong.js"></script>
+
+	<style type="text/css">
+		body {padding: 0; margin: 0; overflow: hidden;}
+	</style>
+
 </head>
 <body>
 
+	<canvas id="canvas" onmousemove="mouseMoved(event)"></canvas>
+
+	<script src="/onlinePong.js"></script>	
+
 	<h1>Online Pong Works</h1>
+
+	<p>Send this to your oponent: <span id="link"></span></p>
 
 	<script type="text/javascript">
 
-		var api = 'http://localhost:8082/', 
-			mySocket = io.connect(api),
-			room, playerId;
+		var QueryString = function () {
+		  // This function is anonymous, is executed immediately and 
+		  // the return value is assigned to QueryString!
+		  var query_string = {};
+		  var query = window.location.search.substring(1);
+		  var vars = query.split("&");
+		  for (var i=0;i<vars.length;i++) {
+		    var pair = vars[i].split("=");
+		    	// If first entry with this name
+		    if (typeof query_string[pair[0]] === "undefined") {
+		      query_string[pair[0]] = pair[1];
+		    	// If second entry with this name
+		    } else if (typeof query_string[pair[0]] === "string") {
+		      var arr = [ query_string[pair[0]], pair[1] ];
+		      query_string[pair[0]] = arr;
+		    	// If third or later entry with this name
+		    } else {
+		      query_string[pair[0]].push(pair[1]);
+		    }
+		  } 
+		    return query_string;
+		} ();
 
-		mySocket.on('welcome', function(data){
-			console.log(data.message);
-			console.log(data.room_id);
+		var api = 'http://localhost:8082/',
+				   room, playerId;
 
-			room = io.connect(api + data.room_id);
+		console.log(QueryString.id);
+
+		//I am player 2
+		if(QueryString.id != undefined && QueryString.id != null){
+
+			room = io.connect(api + QueryString.id);
+
+			initRoom(room);
+		//I am player 1
+		}else{
+
+			console.log("Player 1");
+			var mySocket = io.connect(api);
+
+			mySocket.on('welcome', function(data){
+				console.log(data.message);
+				console.log(api + "?id=" + data.room_id);
+
+				room = io.connect(api + data.room_id);
+
+				initRoom(room);
+
+				document.getElementById("link").innerHTML = 
+					api + "?id=" + data.room_id;
+			});
+		}
+
+		function initRoom(room){
 
 			room.on('playerNumber', function(data){
-				console.log(data);
-				playerId = data.player_id;
-			});
-
+					console.log(data);
+					playerId = data.player_id;
+				});
 
 			room.on('positionChange', function(X, Y, playerId){
-				console.log(Y, X, playerId);
-				newPosition(Y, X, playerId);
-			});
-		});
+					console.log(Y, X, playerId);
+					newPosition(X, Y, playerId);
+				});
 
-		function mouseMoved(event){
-			room.emit('update', event.clientX, 
-				event.clientY, playerId);
+			room.on('gameStarted', function(){
+				startGame();
+			});
+		}
+
+		function notifyStart(){
+			room.emit('start');
+		}
+
+		function mouseMoved(e){
+			room.emit('update', e.clientX, 
+				e.clientY, playerId);
+			newPosition(e.clientX, e.clientY, playerId);
 		}
 
 	</script>
-
-	<canvas id="canvas">
-		
-	</canvas>
-
-	<div id="controller"
-	style="width:825px;height:200px;border:1px solid"
-	onmousemove="mouseMoved(event)">
-
-	</div>
 
 </body>
 </html>
