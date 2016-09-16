@@ -51,8 +51,8 @@ io.sockets.on('connect', function(socket){
 				}
 				socket.emit('record', 
 					{leaderBoard});
-				/*console.log("Score = "+ points);
-				socket.broadcast.emit('gameover');*/
+				/*console.log("Score = "+ points);*/
+				socket.broadcast.emit('record',{leaderBoard});
 			});
 
 			socket.on('update', function(X, Y, playerId){
