@@ -20,10 +20,11 @@
 	<p>Send this to your oponent: <span id="link"></span></p>
 
 	<script type="text/javascript">
-
+	   var result = 0;
 		var QueryString = function () {
 		  // This function is anonymous, is executed immediately and 
 		  // the return value is assigned to QueryString!
+
 		  var query_string = {};
 		  var query = window.location.search.substring(1);
 		  var vars = query.split("&");
@@ -43,62 +44,64 @@
 		  } 
 		    return query_string;
 		} ();
-
 		var api = 'http://localhost:8082/',
 				   room, playerId;
-
 		console.log(QueryString.id);
-
 		//I am player 2
 		if(QueryString.id != undefined && QueryString.id != null){
-
 			room = io.connect(api + QueryString.id);
-
 			initRoom(room);
 		//I am player 1
 		}else{
-
 			console.log("Player 1");
 			var mySocket = io.connect(api);
-
 			mySocket.on('welcome', function(data){
 				console.log(data.message);
 				console.log(api + "?id=" + data.room_id);
-
 				room = io.connect(api + data.room_id);
-
 				initRoom(room);
-
 				document.getElementById("link").innerHTML = 
 					api + "?id=" + data.room_id;
 			});
 		}
-
 		function initRoom(room){
-
 			room.on('playerNumber', function(data){
 					console.log(data);
 					playerId = data.player_id;
 				});
-
 			room.on('positionChange', function(X, Y, playerId){
 					console.log(Y, X, playerId);
 					newPosition(X, Y, playerId);
 				});
-
 			room.on('gameStarted', function(){
 				startGame();
 			});
+			room.on('record', function(data){
+				result = data.leaderBoard;
+			});
 		}
+
+		
 
 		function notifyStart(){
 			room.emit('start');
 		}
-
 		function mouseMoved(e){
 			room.emit('update', e.clientX, 
 				e.clientY, playerId);
 			newPosition(e.clientX, e.clientY, playerId);
+		}
+
+		function gameIsOver(points){
+			room.emit('gameover', points);
+		}
+
+		function afficheRecord(){
+			room.on('record', function(data){
+				console.log("Record : "+JSON.stringify(data,null,4));
+				result = data.leaderBoard;
+			});
+			return result;
 		}
 
 	</script>

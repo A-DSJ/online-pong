@@ -367,8 +367,13 @@ function gameOver() {
 	ctx.font = "20px Arial, sans-serif";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
+	gameIsOver(points);
 	ctx.fillText("Game Over - You scored "+points+" points!", W/2, H/2 + 25 );
-	
+	var varRecord= afficheRecord();
+	if (varRecord < points) {
+		varRecord = points;
+	}
+	ctx.fillText("Le record est de : "+varRecord, W/2, H/2 + 50);
 	// Stop the Animation
 	cancelRequestAnimFrame(init);
 	

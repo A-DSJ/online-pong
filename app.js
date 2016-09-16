@@ -5,7 +5,7 @@ var io = require('socket.io').listen(server);
 
 var openSockets = new Array();
 var players = new Array();
-
+var leaderBoard =0;
 server.listen(8082);
 
 // ROUTAGE
@@ -38,6 +38,21 @@ io.sockets.on('connect', function(socket){
 			socket.on('start', function(){
 				console.log("One player started the game for room:" + id);
 				socket.broadcast.emit('gameStarted');
+			});
+
+			socket.on('record', function(){
+				socket.emit('record', 
+					{leaderBoard});
+			});
+
+			socket.on('gameover', function(points){
+				if (points > leaderBoard) { 
+					leaderBoard = points;
+				}
+				socket.emit('record', 
+					{leaderBoard});
+				/*console.log("Score = "+ points);
+				socket.broadcast.emit('gameover');*/
 			});
 
 			socket.on('update', function(X, Y, playerId){
